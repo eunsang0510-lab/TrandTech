@@ -2,8 +2,8 @@ name: Daily Tech Trend Blog
 
 on:
   schedule:
-    - cron: '0 23 * * *'  # 매일 한국시간 오전 8시
-  workflow_dispatch:        # 수동 실행 가능
+    - cron: '0 23 * * *'
+  workflow_dispatch:
 
 jobs:
   run-blog:
@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
