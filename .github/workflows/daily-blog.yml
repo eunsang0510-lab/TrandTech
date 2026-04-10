@@ -1,0 +1,30 @@
+name: Daily Tech Trend Blog
+
+on:
+  schedule:
+    - cron: '0 23 * * *'  # 매일 한국시간 오전 8시
+  workflow_dispatch:        # 수동 실행 가능
+
+jobs:
+  run-blog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run blog automation
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+          GITHUB_PAGES_REPO: ${{ secrets.GITHUB_PAGES_REPO }}
+        run: python main.py
