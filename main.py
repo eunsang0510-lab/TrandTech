@@ -1,6 +1,6 @@
 from collector.hacker_news import get_top_stories
 from collector.github_trending import get_trending_repos
-from analyzer.claude_analyzer import analyze_trends, generate_blog_post, generate_blog_post_en
+from analyzer.claude_analyzer import analyze_trends, generate_blog_post, generate_blog_post_en, generate_stock_analysis
 from publisher.github_pages import push_post
 from datetime import datetime
 
@@ -19,19 +19,24 @@ def run():
         # 2. AI 분석
         analysis = analyze_trends(stories, repos)
 
-        # 3. 한글 블로그 글 생성 및 포스팅
+        # 3. 주식 분석 생성
+        stock_analysis = generate_stock_analysis(analysis)
+
+        # 4. 한글 블로그 글 생성 및 포스팅
         post_kr = generate_blog_post(analysis, stories, repos)
+        full_content_kr = post_kr["content"] + "\n\n" + stock_analysis
         push_post(
             title=post_kr["title"],
-            content=post_kr["content"],
+            content=full_content_kr,
             date=datetime.now().strftime("%Y-%m-%d")
         )
 
-        # 4. 영어 블로그 글 생성 및 포스팅
+        # 5. 영어 블로그 글 생성 및 포스팅
         post_en = generate_blog_post_en(analysis, stories, repos)
+        full_content_en = post_en["content"] + "\n\n" + stock_analysis
         push_post(
             title=post_en["title"],
-            content=post_en["content"],
+            content=full_content_en,
             date=datetime.now().strftime("%Y-%m-%d")
         )
 

@@ -150,3 +150,54 @@ Write an English blog post based on the data below.
 
     print(f"✅ 영어 블로그 글 생성 완료! 제목: {title}")
     return {"title": title, "content": body}
+
+def generate_stock_analysis(analysis: dict) -> str:
+    """기술 트렌드 기반 주식 분석 생성"""
+    print("주식 분석 생성 중...")
+
+    keywords = ", ".join(analysis["keywords"])
+    hot_topics = "\n".join([f"- {t}" for t in analysis["hot_topics"]])
+
+    prompt = f"""
+당신은 기술 트렌드 기반 주식 분석가입니다.
+오늘의 기술 트렌드를 바탕으로 유망 주식을 분석해주세요.
+
+[오늘의 기술 트렌드 키워드]
+{keywords}
+
+[주목할 토픽]
+{hot_topics}
+
+아래 형식으로 작성해주세요.
+
+## 📈 오늘의 Tech Trend 기반 유망 주식 분석
+
+### 🇺🇸 미국 주식 TOP 10
+
+| 종목명 | 티커 | 선정 이유 | 주목 포인트 |
+|---|---|---|---|
+| (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+... 10개 작성
+
+### 🇰🇷 한국 주식 TOP 10
+
+| 종목명 | 티커 | 선정 이유 | 주목 포인트 |
+|---|---|---|---|
+| (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+... 10개 작성
+
+### ⚠️ 투자 유의사항
+본 포스팅은 투자 참고용 정보이며 투자 권유가 아닙니다. 
+투자 결정은 본인 책임이며, 투자 전 반드시 전문가와 상담하시기 바랍니다.
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=3000,
+        temperature=0.7
+    )
+
+    result = response.choices[0].message.content.strip()
+    print("✅ 주식 분석 생성 완료!")
+    return result
