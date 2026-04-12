@@ -23,8 +23,9 @@ jobs:
 
       - name: Run blog automation
         env:
-            GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-            GH_TOKEN: ${{ secrets.GH_TOKEN }}
-            GH_USERNAME: ${{ secrets.GH_USERNAME }}
-            GH_PAGES_REPO: ${{ secrets.GH_PAGES_REPO }}
+           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+           GH_USERNAME: ${{ secrets.GH_USERNAME }}
+           GH_PAGES_REPO: ${{ secrets.GH_PAGES_REPO }}
         run: python main.py

@@ -1,4 +1,4 @@
-from groq import Groq
+import anthropic
 import json
 from datetime import datetime
 from dotenv import load_dotenv
@@ -6,11 +6,11 @@ import os
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 def analyze_trends(stories: list, repos: list) -> dict:
-    """수집한 데이터를 Groq로 분석"""
-    print("Groq AI 트렌드 분석 중...")
+    """수집한 데이터를 Claude로 분석"""
+    print("Claude AI 트렌드 분석 중...")
 
     hn_text = "\n".join([f"- {s['title']} (score: {s['score']})" for s in stories[:20]])
     gh_text = "\n".join([f"- {r['title']} (stars: {r['score']})" for r in repos[:20]])
@@ -33,14 +33,13 @@ def analyze_trends(stories: list, repos: list) -> dict:
 }}
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
         max_tokens=1000,
-        temperature=0.7
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    text = response.choices[0].message.content.strip()
+    text = message.content[0].text.strip()
 
     if "```json" in text:
         text = text.split("```json")[1].split("```")[0].strip()
@@ -86,14 +85,13 @@ def generate_blog_post(analysis: dict, stories: list, repos: list) -> dict:
 - 맨 첫 줄에 제목만 출력하고 두 번째 줄부터 본문 시작
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
         max_tokens=3000,
-        temperature=0.8
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    content = response.choices[0].message.content.strip()
+    content = message.content[0].text.strip()
     lines = content.strip().split("\n")
     title = lines[0].strip()
     body = "\n".join(lines[1:]).strip()
@@ -136,20 +134,20 @@ Write an English blog post based on the data below.
 - First line is the title only, body starts from second line
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
         max_tokens=3000,
-        temperature=0.8
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    content = response.choices[0].message.content.strip()
+    content = message.content[0].text.strip()
     lines = content.strip().split("\n")
     title = lines[0].strip()
     body = "\n".join(lines[1:]).strip()
 
     print(f"✅ 영어 블로그 글 생성 완료! 제목: {title}")
     return {"title": title, "content": body}
+
 
 def generate_stock_analysis(analysis: dict) -> str:
     """기술 트렌드 기반 주식 분석 생성"""
@@ -177,27 +175,24 @@ def generate_stock_analysis(analysis: dict) -> str:
 | 종목명 | 티커 | 선정 이유 | 주목 포인트 |
 |---|---|---|---|
 | (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
-... 10개 작성
 
 ### 🇰🇷 한국 주식 TOP 10
 
 | 종목명 | 티커 | 선정 이유 | 주목 포인트 |
 |---|---|---|---|
 | (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
-... 10개 작성
 
 ### ⚠️ 투자 유의사항
-본 포스팅은 투자 참고용 정보이며 투자 권유가 아닙니다. 
+본 포스팅은 투자 참고용 정보이며 투자 권유가 아닙니다.
 투자 결정은 본인 책임이며, 투자 전 반드시 전문가와 상담하시기 바랍니다.
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
         max_tokens=3000,
-        temperature=0.7
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    result = response.choices[0].message.content.strip()
+    result = message.content[0].text.strip()
     print("✅ 주식 분석 생성 완료!")
     return result

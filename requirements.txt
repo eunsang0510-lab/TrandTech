@@ -6,3 +6,4 @@ APScheduler
 python-dotenv
 groq
 urllib3
+anthropic
