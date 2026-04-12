@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+GITHUB_TOKEN = os.getenv("GH_TOKEN")
 GITHUB_USERNAME = os.getenv("GH_USERNAME")
 GITHUB_REPO = os.getenv("GH_PAGES_REPO")
 
