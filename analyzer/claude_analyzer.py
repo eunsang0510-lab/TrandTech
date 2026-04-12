@@ -196,3 +196,107 @@ def generate_stock_analysis(analysis: dict) -> str:
     result = message.content[0].text.strip()
     print("✅ 주식 분석 생성 완료!")
     return result
+
+
+def generate_silicon_valley_ads_section(analysis: dict, ads: list) -> str:
+    """실리콘밸리 광고판 분석 섹션 생성"""
+    print("실리콘밸리 광고판 분석 생성 중...")
+
+    keywords = ", ".join(analysis["keywords"])
+    ads_text = "\n".join([f"- {a['title']} ({a['url']})" for a in ads[:10]])
+
+    prompt = f"""
+당신은 실리콘밸리 기술 트렌드 분석가입니다.
+오늘의 기술 트렌드와 실리콘밸리 광고판 관련 뉴스를 바탕으로 분석 섹션을 작성해주세요.
+
+[오늘의 기술 트렌드 키워드]
+{keywords}
+
+[실리콘밸리 광고판 관련 뉴스]
+{ads_text if ads_text else "최근 수집된 광고판 뉴스가 없습니다. 일반적인 실리콘밸리 광고 트렌드를 분석해주세요."}
+
+아래 형식으로 작성해주세요.
+
+## 🗽 실리콘밸리 광고판으로 보는 Tech Trend
+
+실리콘밸리 101번 고속도로 광고판은 IT 업계의 바로미터입니다.
+어떤 기업이 광고판을 샀느냐를 보면 지금 어떤 기술이 핫한지 알 수 있어요.
+
+### 📋 이번 주 주목할 광고판 트렌드
+(광고판에 등장한 기업/기술 분석 3~5개)
+
+### 💡 광고판이 말해주는 투자 인사이트
+(광고판 트렌드에서 읽을 수 있는 투자/기술 인사이트)
+
+### 🔮 다음에 광고판에 등장할 기술은?
+(예측 2~3가지)
+"""
+
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=2000,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    result = message.content[0].text.strip()
+    print("✅ 실리콘밸리 광고판 분석 생성 완료!")
+    return result
+
+
+def generate_weekly_trend_report(analysis: dict, news: list, ads: list) -> dict:
+    """주간 트렌드 변화 분석 특별 포스팅 생성"""
+    print("주간 트렌드 변화 분석 생성 중...")
+
+    keywords = ", ".join(analysis["keywords"])
+    news_text = "\n".join([f"- {n['title']}" for n in news[:15]])
+    ads_text = "\n".join([f"- {a['title']}" for a in ads[:10]])
+
+    prompt = f"""
+당신은 실리콘밸리 기술 트렌드 전문 분석가입니다.
+이번 주 수집된 뉴스와 실리콘밸리 광고판 데이터를 바탕으로
+트렌드 변화를 분석하는 특별 주간 리포트를 작성해주세요.
+
+[이번 주 기술 키워드]
+{keywords}
+
+[이번 주 주요 뉴스]
+{news_text}
+
+[실리콘밸리 광고판 관련 뉴스]
+{ads_text if ads_text else "광고판 관련 뉴스 없음. 일반적인 실리콘밸리 트렌드 기반으로 분석해주세요."}
+
+아래 형식으로 작성해주세요.
+
+## 📊 이번 주 Tech Trend 변화 리포트
+
+### 🔥 변화하고 있다 — 이미 바뀌기 시작한 트렌드
+(구체적인 근거와 함께 2~3가지)
+
+### ⏳ 아직 변하지 않았다 — 여전히 유효한 트렌드
+(구체적인 근거와 함께 2~3가지)
+
+### 🔮 변할 것 같다 — 다음 주 주목할 변화 신호
+(구체적인 근거와 함께 2~3가지)
+
+### 💡 실리콘밸리 광고판이 말해주는 것
+(광고판 트렌드와 연결한 인사이트)
+
+### 📌 이번 주 핵심 요약
+(3줄 요약)
+"""
+
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=3000,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    content = message.content[0].text.strip()
+    lines = content.strip().split("\n")
+
+    # 제목 생성
+    today = datetime.now().strftime("%Y년 %m월 %d일")
+    title = f"[주간 리포트] {today} Tech Trend 변화 분석"
+
+    print(f"✅ 주간 트렌드 리포트 생성 완료!")
+    return {"title": title, "content": content}
