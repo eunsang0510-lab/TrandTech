@@ -41,7 +41,7 @@ def push_post(title: str, content: str, date: str = None) -> bool:
 layout: post
 title: "{title}"
 date: {date}
-categories: [tech, trends]
+categories: tech-trend
 tags: [AI, 기술트렌드, 주식, 실리콘밸리]
 description: "{description}"
 ---
