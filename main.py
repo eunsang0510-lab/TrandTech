@@ -64,7 +64,8 @@ def run():
         push_post(
             title=post_kr["title"],
             content=full_content_kr,
-            date=datetime.now().strftime("%Y-%m-%d")
+            date=datetime.now().strftime("%Y-%m-%d"),
+            keywords=analysis["keywords"]
         )
 
         # 6. 영어 블로그 글 생성 및 포스팅
