@@ -173,21 +173,38 @@ def generate_stock_analysis(analysis: dict) -> str:
 [주목할 토픽]
 {hot_topics}
 
+[주의사항]
+- 반도체 관련주만 추천하지 말고 반도체 성장의 영향을 받는 다양한 산업군을 고려해주세요
+- 고려할 산업군: 전력, 전선, 데이터센터, ESS, 배터리, 냉각시스템, 신재생에너지 등
+- 특정 산업에 편중되지 않고 다양한 섹터에서 골고루 선정해주세요
+
 아래 형식으로 작성해주세요.
 
 ## 📈 오늘의 Tech Trend 기반 유망 주식 분석
 
 ### 🇺🇸 미국 주식 TOP 10
 
-| 종목명 | 티커 | 선정 이유 | 주목 포인트 |
-|---|---|---|---|
-| (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+| 종목명 | 티커 | 섹터 | 선정 이유 | 주목 포인트 |
+|---|---|---|---|---|
+| (종목명) | (티커) | (섹터) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+
+> 섹터 다양성 확보: 반도체, 전력/전선, 데이터센터, ESS/배터리, 소프트웨어 등 골고루 선정
 
 ### 🇰🇷 한국 주식 TOP 10
 
-| 종목명 | 티커 | 선정 이유 | 주목 포인트 |
+| 종목명 | 티커 | 섹터 | 선정 이유 | 주목 포인트 |
+|---|---|---|---|---|
+| (종목명) | (티커) | (섹터) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+
+> 섹터 다양성 확보: 반도체, 전력/전선, 데이터센터, ESS/배터리, 소프트웨어 등 골고루 선정
+
+### 🚀 유망 스타트업 TOP 10
+
+| 스타트업명 | 국가 | 분야 | 주목 이유 |
 |---|---|---|---|
-| (종목명) | (티커) | (트렌드 연관성 한 줄) | (주목할 점 한 줄) |
+| (스타트업명) | (국가) | (분야) | (주목할 이유 한 줄) |
+
+> 최근 펀딩을 받았거나 기술 트렌드와 연관성이 높은 스타트업 위주로 선정
 
 ### ⚠️ 투자 유의사항
 본 포스팅은 투자 참고용 정보이며 투자 권유가 아닙니다.
@@ -307,3 +324,92 @@ def generate_weekly_trend_report(analysis: dict, news: list, ads: list) -> dict:
 
     print(f"✅ 주간 트렌드 리포트 생성 완료!")
     return {"title": title, "content": content}
+
+
+def generate_blog_post_by_region(analysis: dict, stories: list, repos: list, region: str) -> dict:
+    """지역별 블로그 글 생성"""
+    print(f"{region} 지역 블로그 글 생성 중...")
+
+    region_info = {
+        "미국": {
+            "ko": "미국",
+            "en": "US",
+            "focus": "실리콘밸리, 빅테크, 나스닥, 미국 스타트업 생태계 중심으로",
+            "emoji": "🇺🇸"
+        },
+        "한국": {
+            "ko": "한국",
+            "en": "Korea",
+            "focus": "한국 IT 기업, 코스피/코스닥, K-스타트업, 삼성/네이버/카카오 등 중심으로",
+            "emoji": "🇰🇷"
+        },
+        "유럽": {
+            "ko": "유럽",
+            "en": "Europe",
+            "focus": "유럽 테크 생태계, EU AI 규제, 독일/영국/프랑스 스타트업 중심으로",
+            "emoji": "🇪🇺"
+        },
+        "중국": {
+            "ko": "중국",
+            "en": "China",
+            "focus": "중국 빅테크, 알리바바/텐센트/화웨이, 중국 AI 발전 현황 중심으로",
+            "emoji": "🇨🇳"
+        },
+        "인도": {
+            "ko": "인도",
+            "en": "India",
+            "focus": "인도 IT 아웃소싱, 벵갈루루 스타트업, 인도 디지털 전환 중심으로",
+            "emoji": "🇮🇳"
+        }
+    }
+
+    info = region_info.get(region, region_info["미국"])
+    keywords = ", ".join(analysis["keywords"])
+    hot_topics = "\n".join([f"- {t}" for t in analysis["hot_topics"]])
+    hn_text = "\n".join([f"- [{s['score']}점] {s['title']}" for s in stories[:10]])
+    gh_text = "\n".join([f"- ⭐{r['score']} {r['title']}" for r in repos[:10]])
+
+    prompt = f"""
+당신은 글로벌 IT 기술 트렌드 블로그 작가입니다.
+오늘은 {info['emoji']} {region} 관점에서 기술 트렌드를 분석하는 글을 작성해주세요.
+
+[오늘의 키워드]
+{keywords}
+
+[주목할 토픽]
+{hot_topics}
+
+[Hacker News 인기글]
+{hn_text}
+
+[GitHub Trending]
+{gh_text}
+
+[작성 조건]
+- 제목은 반드시 "{info['emoji']} [{region} Tech Trend]" 로 시작하는 매력적인 한국어 제목
+- {info['focus']} 분석해주세요
+- 분량은 1500자 이상
+- 맨 첫 줄에 제목만 출력하고 두 번째 줄부터 본문 시작
+- 본문 시작 전 아래 형식으로 목차 추가
+  ## 목차
+  - [섹션1](#섹션1)
+  - [섹션2](#섹션2)
+- 구성: 도입부 → {region} 기술 트렌드 분석 → 주목할 기업/기술 → 마무리
+- 각 섹션은 ## 헤딩으로 구분
+- IT 기획자/개발자가 읽기 좋은 인사이트 포함
+- HTML 태그 없이 마크다운으로 작성
+"""
+
+    message = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=3000,
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    content = message.content[0].text.strip()
+    lines = content.strip().split("\n")
+    title = lines[0].strip()
+    body = "\n".join(lines[1:]).strip()
+
+    print(f"✅ {region} 블로그 글 생성 완료! 제목: {title}")
+    return {"title": title, "content": body}
