@@ -49,7 +49,7 @@ def run():
         analysis = analyze_trends(stories, repos)
 
         # 3. 주식 분석 생성
-        stock_analysis = generate_stock_analysis(analysis)
+        stock_analysis = generate_stock_analysis(analysis, region)
 
         # 4. 실리콘밸리 광고판 분석 생성
         sv_ads_section = generate_silicon_valley_ads_section(analysis, ads)

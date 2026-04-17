@@ -155,17 +155,27 @@ Write an English blog post based on the data below.
     print(f"✅ 영어 블로그 글 생성 완료! 제목: {title}")
     return {"title": title, "content": body}
 
-
-def generate_stock_analysis(analysis: dict) -> str:
+def generate_stock_analysis(analysis: dict, region: str = "미국") -> str:
     """기술 트렌드 기반 주식 분석 생성"""
     print("주식 분석 생성 중...")
 
     keywords = ", ".join(analysis["keywords"])
     hot_topics = "\n".join([f"- {t}" for t in analysis["hot_topics"]])
 
+    # 지역별 증시 정보
+    region_market = {
+        "미국": {"market": "나스닥/NYSE", "currency": "USD", "flag": "🇺🇸"},
+        "한국": {"market": "코스피/코스닥", "currency": "KRW", "flag": "🇰🇷"},
+        "유럽": {"market": "유로스톡스/FTSE", "currency": "EUR", "flag": "🇪🇺"},
+        "중국": {"market": "상하이/선전", "currency": "CNY", "flag": "🇨🇳"},
+        "인도": {"market": "BSE/NSE", "currency": "INR", "flag": "🇮🇳"},
+    }
+
+    info = region_market.get(region, region_market["미국"])
+
     prompt = f"""
-당신은 기술 트렌드 기반 주식 분석가입니다.
-오늘의 기술 트렌드를 바탕으로 유망 주식을 분석해주세요.
+당신은 기술 트렌드 기반 글로벌 주식 분석가입니다.
+오늘은 {info['flag']} {region} 관점에서 유망 주식을 분석해주세요.
 
 [오늘의 기술 트렌드 키워드]
 {keywords}
@@ -174,15 +184,14 @@ def generate_stock_analysis(analysis: dict) -> str:
 {hot_topics}
 
 [주의사항]
-- 반도체 관련주만 추천하지 말고 반도체 성장의 영향을 받는 다양한 산업군을 고려해주세요
-- 고려할 산업군: 전력, 전선, 데이터센터, ESS, 배터리, 냉각시스템, 신재생에너지 등
-- 특정 산업에 편중되지 않고 다양한 섹터에서 골고루 선정해주세요
+- 반도체 관련주만 추천하지 말고 전력, 전선, 데이터센터, ESS, 배터리, 냉각시스템 등 다양한 섹터 고려
+- 특정 산업에 편중되지 않고 골고루 선정
 
 아래 형식으로 작성해주세요.
 
 ## 📈 오늘의 Tech Trend 기반 유망 주식 분석
 
-### 🇺🇸 미국 주식 TOP 10
+### {info['flag']} {region} 주식 TOP 10 ({info['market']})
 
 | 종목명 | 티커 | 섹터 | 선정 이유 | 주목 포인트 |
 |---|---|---|---|---|
@@ -190,7 +199,7 @@ def generate_stock_analysis(analysis: dict) -> str:
 
 > 섹터 다양성 확보: 반도체, 전력/전선, 데이터센터, ESS/배터리, 소프트웨어 등 골고루 선정
 
-### 🇰🇷 한국 주식 TOP 10
+### 🇰🇷 한국 주식 TOP 10 (코스피/코스닥)
 
 | 종목명 | 티커 | 섹터 | 선정 이유 | 주목 포인트 |
 |---|---|---|---|---|
@@ -203,8 +212,6 @@ def generate_stock_analysis(analysis: dict) -> str:
 | 스타트업명 | 국가 | 분야 | 주목 이유 |
 |---|---|---|---|
 | (스타트업명) | (국가) | (분야) | (주목할 이유 한 줄) |
-
-> 최근 펀딩을 받았거나 기술 트렌드와 연관성이 높은 스타트업 위주로 선정
 
 ### ⚠️ 투자 유의사항
 본 포스팅은 투자 참고용 정보이며 투자 권유가 아닙니다.
