@@ -11,10 +11,11 @@ GITHUB_USERNAME = os.getenv("GH_USERNAME")
 GITHUB_REPO = os.getenv("GH_PAGES_REPO")
 
 
-def push_post(title: str, content: str, date: str = None, keywords: list = None) -> bool:
+def push_post(title: str, content: str, date: str = None, keywords: list = None, lang: str = "ko", weekly: bool = False) -> bool:
     """마크다운 파일을 GitHub Pages 레포에 push"""
+    now = datetime.now()
     if not date:
-        date = datetime.now().strftime("%Y-%m-%d")
+        date = now.strftime("%Y-%m-%d")
 
     print(f"USERNAME: {GITHUB_USERNAME}")
     print(f"REPO: {GITHUB_REPO}")
@@ -33,16 +34,36 @@ def push_post(title: str, content: str, date: str = None, keywords: list = None)
 
     filename = f"_posts/{date}-{slug}.md"
 
-    # description 생성
+    # YAML 깨짐 방지: 제목·설명의 큰따옴표를 작은따옴표로 치환
+    safe_title = title.replace('"', "'")
     description = content[:150].replace("\n", " ").replace('"', "'").strip()
+
+    # 같은 날 포스트 순서 구분을 위해 현재 시각 포함
+    date_time = now.strftime("%Y-%m-%d %H:%M:%S +0900")
+
+    # 카테고리: 위클리 / 언어별 구분
+    if weekly:
+        category = "weekly"
+    elif lang == "en":
+        category = "en"
+    else:
+        category = "ko"
+
+    # 태그: 분석된 키워드 사용, 없으면 기본값
+    if keywords:
+        tag_list = keywords[:6]
+    else:
+        tag_list = ["AI", "Tech", "Trend"]
+    tags_yaml = ", ".join(f'"{t}"' for t in tag_list)
 
     # Jekyll front matter
     file_content = f"""---
 layout: post
-title: "{title}"
-date: {date}
-categories: tech-trend
-tags: [AI, 기술트렌드, 주식, 실리콘밸리]
+title: "{safe_title}"
+date: {date_time}
+lang: {lang}
+categories: [tech-trend, {category}]
+tags: [{tags_yaml}]
 description: "{description}"
 ---
 
@@ -102,3 +123,4 @@ AI is changing everything.
 Check daily tech trend updates!
 """
     push_post(title=test_title, content=test_content)
+    

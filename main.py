@@ -42,8 +42,6 @@ def run():
         # 1. 데이터 수집
         stories = get_top_stories(limit=30)
         repos = get_trending_repos(limit=20)
-        ads = get_silicon_valley_ads()
-        news = get_tech_news()
 
         # 2. AI 분석
         analysis = analyze_trends(stories, repos)
@@ -51,44 +49,44 @@ def run():
         # 3. 주식 분석 생성
         stock_analysis = generate_stock_analysis(analysis, region)
 
-        # 4. 실리콘밸리 광고판 분석 생성
-        sv_ads_section = generate_silicon_valley_ads_section(analysis, ads)
+        today = datetime.now().strftime("%Y-%m-%d")
 
-        # 5. 지역별 한글 블로그 글 생성 및 포스팅
+        # 4. 지역별 한글 블로그 글 생성 및 포스팅
         post_kr = generate_blog_post_by_region(analysis, stories, repos, region)
-        full_content_kr = (
-            post_kr["content"] + "\n\n"
-            + sv_ads_section + "\n\n"
-            + stock_analysis
-        )
+        full_content_kr = post_kr["content"] + "\n\n" + stock_analysis
         push_post(
             title=post_kr["title"],
             content=full_content_kr,
-            date=datetime.now().strftime("%Y-%m-%d"),
-            keywords=analysis["keywords"]
+            date=today,
+            keywords=analysis["keywords"],
+            lang="ko"
         )
 
-        # 6. 영어 블로그 글 생성 및 포스팅
+        # 5. 영어 블로그 글 생성 및 포스팅
         post_en = generate_blog_post_en(analysis, stories, repos)
-        full_content_en = (
-            post_en["content"] + "\n\n"
-            + sv_ads_section + "\n\n"
-            + stock_analysis
-        )
+        full_content_en = post_en["content"] + "\n\n" + stock_analysis
         push_post(
             title=post_en["title"],
             content=full_content_en,
-            date=datetime.now().strftime("%Y-%m-%d")
+            date=today,
+            keywords=analysis["keywords"],
+            lang="en"
         )
 
-        # 7. 매주 월요일 주간 트렌드 리포트 발행
+        # 6. 매주 월요일 주간 트렌드 리포트 발행 (실리콘밸리 광고판 포함)
         if weekday == 0:
             print("📅 오늘은 월요일! 주간 트렌드 리포트 생성 중...")
+            ads = get_silicon_valley_ads()
+            news = get_tech_news()
+            sv_ads_section = generate_silicon_valley_ads_section(analysis, ads)
             weekly_report = generate_weekly_trend_report(analysis, news, ads)
+            weekly_content = weekly_report["content"] + "\n\n" + sv_ads_section
             push_post(
                 title=weekly_report["title"],
-                content=weekly_report["content"],
-                date=datetime.now().strftime("%Y-%m-%d")
+                content=weekly_content,
+                date=today,
+                keywords=analysis["keywords"],
+                weekly=True
             )
 
         print("=" * 50)
