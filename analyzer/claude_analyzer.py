@@ -100,7 +100,7 @@ def generate_blog_post(analysis: dict, stories: list, repos: list) -> dict:
 
     content = message.content[0].text.strip()
     lines = content.strip().split("\n")
-    title = lines[0].strip()
+    title = lines[0].strip().lstrip("#").strip()
     body = "\n".join(lines[1:]).strip()
 
     print(f"✅ 블로그 글 생성 완료! 제목: {title}")
@@ -149,7 +149,7 @@ Write an English blog post based on the data below.
 
     content = message.content[0].text.strip()
     lines = content.strip().split("\n")
-    title = lines[0].strip()
+    title = lines[0].strip().lstrip("#").strip()
     body = "\n".join(lines[1:]).strip()
 
     print(f"✅ 영어 블로그 글 생성 완료! 제목: {title}")
@@ -415,7 +415,7 @@ def generate_blog_post_by_region(analysis: dict, stories: list, repos: list, reg
 
     content = message.content[0].text.strip()
     lines = content.strip().split("\n")
-    title = lines[0].strip()
+    title = lines[0].strip().lstrip("#").strip()
     body = "\n".join(lines[1:]).strip()
 
     print(f"✅ {region} 블로그 글 생성 완료! 제목: {title}")

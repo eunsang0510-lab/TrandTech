@@ -34,9 +34,18 @@ def push_post(title: str, content: str, date: str = None, keywords: list = None,
 
     filename = f"_posts/{date}-{slug}.md"
 
-    # YAML 깨짐 방지: 제목·설명의 큰따옴표를 작은따옴표로 치환
-    safe_title = title.replace('"', "'")
-    description = content[:150].replace("\n", " ").replace('"', "'").strip()
+    # YAML 깨짐 방지: 제목·설명의 큰따옴표/특수따옴표를 작은따옴표로 치환
+    safe_title = title.replace('"', "'").replace('“', "'").replace('”', "'")
+
+    # description: 첫 번째 일반 텍스트 단락 사용 (TOC/링크/헤딩 제외)
+    description = ""
+    for line in content.split("\n"):
+        stripped = line.strip()
+        if stripped and not stripped.startswith("#") and not stripped.startswith("-") and not stripped.startswith("|") and not stripped.startswith(">"):
+            description = stripped[:120].replace('"', "'").replace('“', "'").replace('”', "'").strip()
+            break
+    if not description:
+        description = content[:120].replace("\n", " ").replace('"', "'").replace('“', "'").replace('”', "'").strip()
 
     # 같은 날 포스트 순서 구분을 위해 현재 시각 포함
     date_time = now.strftime("%Y-%m-%d %H:%M:%S +0900")
