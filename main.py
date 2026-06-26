@@ -12,7 +12,9 @@ from analyzer.claude_analyzer import (
     generate_weekly_trend_report
 )
 from publisher.github_pages import push_post
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
 
 # 요일별 지역 매핑
 # 0=월, 1=화, 2=수, 3=목, 4=금, 5=토, 6=일
@@ -34,10 +36,11 @@ def run():
     print("=" * 50)
 
     try:
-        # 오늘 요일 확인
-        weekday = datetime.now().weekday()
+        # 오늘 요일 확인 (KST 기준)
+        now_kst = datetime.now(KST)
+        weekday = now_kst.weekday()
         region = REGION_BY_WEEKDAY[weekday]
-        print(f"🌍 오늘의 지역: {region}")
+        print(f"🌍 오늘의 지역: {region} (KST: {now_kst.strftime('%Y-%m-%d %H:%M')})")
 
         # 1. 데이터 수집
         stories = get_top_stories(limit=30)
@@ -49,7 +52,7 @@ def run():
         # 3. 주식 분석 생성
         stock_analysis = generate_stock_analysis(analysis, region)
 
-        today = datetime.now().strftime("%Y-%m-%d")
+        today = now_kst.strftime("%Y-%m-%d")
 
         # 4. 지역별 한글 블로그 글 생성 및 포스팅
         post_kr = generate_blog_post_by_region(analysis, stories, repos, region)

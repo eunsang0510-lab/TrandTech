@@ -1,7 +1,9 @@
 import requests
 import base64
 import os
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+KST = timezone(timedelta(hours=9))
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +15,7 @@ GITHUB_REPO = os.getenv("GH_PAGES_REPO")
 
 def push_post(title: str, content: str, date: str = None, keywords: list = None, lang: str = "ko", weekly: bool = False) -> bool:
     """마크다운 파일을 GitHub Pages 레포에 push"""
-    now = datetime.now()
+    now = datetime.now(KST)
     if not date:
         date = now.strftime("%Y-%m-%d")
 
