@@ -5,6 +5,9 @@ on:
     - cron: '0 0 1 * *'  # 매월 1일 자정 실행
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
