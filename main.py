@@ -77,20 +77,25 @@ def run():
         )
 
         # 6. 매주 월요일 주간 트렌드 리포트 발행 (실리콘밸리 광고판 포함)
+        # 일간 포스트는 이미 발행 완료된 상태이므로, 주간 리포트 실패가
+        # 전체 파이프라인을 실패로 만들지 않도록 별도로 예외 처리한다.
         if weekday == 0:
-            print("📅 오늘은 월요일! 주간 트렌드 리포트 생성 중...")
-            ads = get_silicon_valley_ads()
-            news = get_tech_news()
-            sv_ads_section = generate_silicon_valley_ads_section(analysis, ads)
-            weekly_report = generate_weekly_trend_report(analysis, news, ads)
-            weekly_content = weekly_report["content"] + "\n\n" + sv_ads_section
-            push_post(
-                title=weekly_report["title"],
-                content=weekly_content,
-                date=today,
-                keywords=analysis["keywords"],
-                weekly=True
-            )
+            try:
+                print("📅 오늘은 월요일! 주간 트렌드 리포트 생성 중...")
+                ads = get_silicon_valley_ads()
+                news = get_tech_news()
+                sv_ads_section = generate_silicon_valley_ads_section(analysis, ads)
+                weekly_report = generate_weekly_trend_report(analysis, news, ads)
+                weekly_content = weekly_report["content"] + "\n\n" + sv_ads_section
+                push_post(
+                    title=weekly_report["title"],
+                    content=weekly_content,
+                    date=today,
+                    keywords=analysis["keywords"],
+                    weekly=True
+                )
+            except Exception as e:
+                print(f"⚠️ 주간 트렌드 리포트 생성 실패 (일간 포스트는 정상 발행됨): {e}")
 
         print("=" * 50)
         print(f"🎉 전체 파이프라인 완료!")
